@@ -57,48 +57,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
             ],
             [
-                'header' => 'HITAM',
-                'value' => function ($model) {
-                        return '-';
-                    },
-            ],
-            [
-                'attribute' => 'C1',
-                'format' => 'raw',
-                'value' => function ($model) {
-                        return is_object($model->hitam) && $model->hitam->c1 == 1
-                            ? '<div style="text-align: center;"><i class="fas fa-check"></i></div>'
-                            : '<div style="text-align: center;"><i class="fas fa-ban" style="color:#f31212;"></i></div>';
-                    },
-            ],
-            [
-                'attribute' => 'C2',
-                'format' => 'raw',
-                'value' => function ($model) {
-                        return is_object($model->hitam) && $model->hitam->c2 == 1
-                            ? '<div style="text-align: center;"><i class="fas fa-check"></i></div>'
-                            : '<div style="text-align: center;"><i class="fas fa-ban" style="color:#f31212;"></i></div>';
-                    },
-            ],
-            [
-                'attribute' => 'C3',
-                'format' => 'raw',
-                'value' => function ($model) {
-                        return is_object($model->hitam) && $model->hitam->c3 == 1
-                            ? '<div style="text-align: center;"><i class="fas fa-check"></i></div>'
-                            : '<div style="text-align: center;"><i class="fas fa-ban" style="color:#f31212;"></i></div>';
-                    },
-            ],
-            [
-                'attribute' => 'C4',
-                'format' => 'raw',
-                'value' => function ($model) {
-                        return is_object($model->hitam) && $model->hitam->c4 == 1
-                            ? '<div style="text-align: center;"><i class="fas fa-check"></i></div>'
-                            : '<div style="text-align: center;"><i class="fas fa-ban" style="color:#f31212;"></i></div>';
-                    },
-            ],
-            [
                 'header' => 'MERAH',
                 'value' => function ($model) {
                         return '-';
@@ -141,6 +99,58 @@ $this->params['breadcrumbs'][] = $this->title;
                             : '<div style="text-align: center;"><i class="fas fa-ban" style="color:#f31212;"></i></div>';
                     },
             ],
+            
+            [
+                'header' => 'HITAM',
+                'value' => function ($model) {
+                        return '-';
+                    },
+            ],
+            [
+                'attribute' => 'C1',
+                'format' => 'raw',
+                'value' => function ($model) {
+                        return is_object($model->hitam) && $model->hitam->c1 == 1
+                            ? '<div style="text-align: center;"><i class="fas fa-check"></i></div>'
+                            : '<div style="text-align: center;"><i class="fas fa-ban" style="color:#f31212;"></i></div>';
+                    },
+            ],
+            [
+                'attribute' => 'C2',
+                'format' => 'raw',
+                'value' => function ($model) {
+                        return is_object($model->hitam) && $model->hitam->c2 == 1
+                            ? '<div style="text-align: center;"><i class="fas fa-check"></i></div>'
+                            : '<div style="text-align: center;"><i class="fas fa-ban" style="color:#f31212;"></i></div>';
+                    },
+            ],
+            [
+                'attribute' => 'C3',
+                'format' => 'raw',
+                'value' => function ($model) {
+                        return is_object($model->hitam) && $model->hitam->c3 == 1
+                            ? '<div style="text-align: center;"><i class="fas fa-check"></i></div>'
+                            : '<div style="text-align: center;"><i class="fas fa-ban" style="color:#f31212;"></i></div>';
+                    },
+            ],
+            [
+                'attribute' => 'C4',
+                'format' => 'raw',
+                'value' => function ($model) {
+                        return is_object($model->hitam) && $model->hitam->c4 == 1
+                            ? '<div style="text-align: center;"><i class="fas fa-check"></i></div>'
+                            : '<div style="text-align: center;"><i class="fas fa-ban" style="color:#f31212;"></i></div>';
+                    },
+            ],
+            [
+                'attribute' => 'Lapak',
+                'format' => 'raw',
+                'value' => function ($model) {
+
+                        return '<div style="text-align: center;"><b>' . ($model->lapak ?? '-') . '</b></div>';
+                    },
+            ],
+
 
             // [
             //     'attribute' => 'C1',
@@ -180,7 +190,6 @@ $this->params['breadcrumbs'][] = $this->title;
             //         },
             // ],
             [
-                'header' => 'Aksi',
                 'class' => \yii\grid\ActionColumn::className(),
                 'urlCreator' => function ($action, $model, $key, $index, $column) {
                         return \yii\helpers\Url::toRoute([$action, 'id' => $model->id]);

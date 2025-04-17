@@ -77,7 +77,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'ss3',
                             'format' => 'raw',
                             'value' => function ($model) {
-                                return $model->ss2 == 1
+                                return $model->ss3 == 1
                                     ? '<i class="fas fa-check" style=" padding: 5px; color: #fff; background-color:#28a745;"></i>'
                                     : '<i class="fas fa-ban" style="color:#f31212; font-size: 1.4rem;"></i>';
                             },

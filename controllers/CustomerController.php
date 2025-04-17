@@ -273,7 +273,9 @@ class CustomerController extends Controller
                     }
                 }
 
-                return $this->redirect(['view', 'id' => $id]);
+                // return $this->redirect(['index', 'id' => $id]);
+                return $this->redirect(['index']);
+
             }
         }
 

@@ -14,17 +14,26 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin(); ?>
     <hr>
 
-    <div class="row">
-        <div class="col-lg-6">
-            <h3>Nama</h3>
+    <div style="color: white; display: flex;">
+        <div style="display: flex; margin-right: 1.2rem;">
+            <h3 style="margin-right: 1.2rem;">Nama</h3>
             <?= $form->field($model, 'nama')->textInput(['maxlength' => true, 'style' => 'font-weight: bold; font-size: 2rem; height: 3rem;'])->label(false) ?>
         </div>
-        <div class="col-lg-6">
-        <h3>Lapak</h3>
-        <?= $form->field($model, 'lapak')->dropDownList(['1' => '1', '2' => '2'], ['prompt' => 'Jumlah Lapak', 'style' => 'font-weight: bold; font-size: 1.2rem; height: 3rem;'])->label(false) ?>
+        <div style="display: flex; ">
+            <h3>Jumlah Lapak</h3>
+            <?= $form->field($model, 'lapak')->radioList(
+                ['1' => '1', '2' => '2'],
+                [
+                    'itemOptions' => [
+                        'class' => 'form-check-input',
+                        'style' => 'transform: scale(1.5); margin-right: 10px; margin-left: 15px;', // Menambahkan jarak antar radio button
+                    ],
+                    'class' => 'd-flex justify-content-center', // Membuat radio button menjadi center
+                ]
+            )->label(false) ?>
         </div>
     </div>
-    <div class="card mt-3 p-4">
+    <div class="card p-4">
         <div class="row">
             <div class="col-lg-4">
                 <div class="row">
@@ -200,8 +209,8 @@ use yii\widgets\ActiveForm;
         </div>
     </div>
 
-    <div class="form-group row mt-4">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+    <div class="form-group  mt-4">
+        <?= Html::submitButton('Simpan', ['class' => 'btn btn-primary', 'style' => 'font-size: 24px; font-weight:bold; padding:1.2rem;']) ?>
     </div>
     <?php ActiveForm::end(); ?>
 </div>

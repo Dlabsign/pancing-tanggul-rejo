@@ -39,6 +39,7 @@ class Customer extends \yii\db\ActiveRecord
     public $c4_hitam;
     public $ikan_id_hitam;
 
+
     /**
      * {@inheritdoc}
      */
@@ -47,7 +48,7 @@ class Customer extends \yii\db\ActiveRecord
         return [
             [['nama'], 'required'],
             [['ikan_id_merah', 'ikan_id_hitam'], 'safe'],
-            [['c1_merah', 'c2_merah', 'c3_merah', 'c4_merah', 'ss1', 'ss2', 'ss3', 'lapak'], 'integer'],
+            [['c1_merah', 'c2_merah', 'c3_merah', 'c4_merah', 'c1_hitam', 'c2_hitam', 'c3_hitam', 'c4_hitam', 'ss1', 'ss2', 'ss3', 'lapak'], 'integer'],
             [['nama'], 'string', 'max' => 255],
         ];
     }
