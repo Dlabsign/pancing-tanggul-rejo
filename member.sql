@@ -1,4 +1,4 @@
-c:\Users\danie\OneDrive\Pictures\SQl.txtINSERT INTO `customer`(`nama`, `ss1`, `ss2`, `ss3`, `lapak`) VALUES
+INSERT INTO `customer`(`nama`, `ss1`, `ss2`, `ss3`, `lapak`) VALUES
 ('User1', 1, 0, 1, 1),
 ('User2', 0, 1, 0, 2),
 ('User3', 1, 0, 1, 1),
