@@ -53,7 +53,6 @@ $dateToday = date('d-m-Y');
                             <th style="text-align: center;">
                                 <input type="checkbox" id="check-all" style="transform: scale(1.3);">
                             </th>
-
                             <th>Nama</th>
                             <th>Lapak</th>
                             <th>NO Lapak</th>
@@ -95,8 +94,8 @@ $dateToday = date('d-m-Y');
                                     <?php endif; ?>
                                 </td>
 
-                                <!-- <td><?= Html::encode($customer->nama) ?></td> -->
-                                <td><?= Html::encode($customer->lapak) ?></td>
+                                <td style="text-align: center;"><?= Html::encode($customer->nama) ?></td>
+                                <td style="text-align: center;"><?= Html::encode($customer->lapak) ?></td>
                                 <td class="lapak-number" style="font-weight: bold; text-align: center;"
                                     id="lapak-<?= $customer->id ?>">
                                     <?php if ($sudahDiundi): ?>
