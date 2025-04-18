@@ -128,7 +128,7 @@ $dateToday = date('d-m-Y');
         <table>
             <thead>
                 <tr style="text-align: center; background-color: yellow;">
-                    <th>Nama Customer</th>
+                    <th>Nama</th>
                     <th>Jumlah Lapak</th>
                     <th>NO Lapak</th>
                     <th>SS1</th>

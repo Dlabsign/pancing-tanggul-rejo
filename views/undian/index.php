@@ -22,6 +22,8 @@ $dateToday = date('d-m-Y');
             'action' => ['index'],
             'method' => 'post',
         ]); ?>
+
+
         <?php
         $tanggalInput = Yii::$app->request->get('tanggal', '');
         $id = Yii::$app->request->get('id', null);
@@ -39,14 +41,22 @@ $dateToday = date('d-m-Y');
                 <?= Html::submitButton('Simpan', ['class' => 'btn btn-success']) ?>
             </div>
         <?php elseif (!empty($id) && !empty($tanggalInput)): ?>
-            <h1><?= Html::encode($tanggalInput) ?></h1>
-        <?php endif; ?>
+            <div style="margin-bottom: 10px;">
+                <!-- Tambahkan input pencarian -->
+                <input style="font-size:2rem; font-weight:bold;" type="text" id="search-input" class="form-control"
+                    placeholder="Cari Nama Customer..." oninput="filterTable()"
+                    onkeydown="if(event.key === 'Enter'){ event.preventDefault(); return false; }">
+            </div> <?php endif; ?>
 
     </div>
+
     <?php if ($lomba_id !== null): ?>
 
         <div style="display: flex;">
             <div style="flex: 1; padding-right: 20px;">
+                <p>
+                    <?= Html::a('Cetak Daftar Undian', ['undian/print', 'id' => Yii::$app->request->get('id'), 'tanggal' => Yii::$app->request->get('tanggal')], ['class' => 'btn btn-primary', 'target' => '_blank']) ?>
+                </p>
                 <table class="table table-bordered">
                     <thead style="text-align: center;">
                         <tr>
@@ -75,7 +85,7 @@ $dateToday = date('d-m-Y');
 
                             $sudahDiundi = $undian !== null;
                             ?>
-                            <tr>
+                            <tr class="customer-row" data-name="<?= Html::encode($customer->nama) ?>">
                                 <!-- <td style="text-align: center;">
                                     <?php if (!$sudahDiundi): ?>
                                         <input type="checkbox" class="customer-checkbox" data-lapak="<?= $customer->lapak ?>"
@@ -124,9 +134,7 @@ $dateToday = date('d-m-Y');
             </div>
         </div>
 
-        <p>
-            <?= Html::a('Cetak Daftar Undian', ['undian/print', 'id' => Yii::$app->request->get('id'), 'tanggal' => Yii::$app->request->get('tanggal')], ['class' => 'btn btn-primary', 'target' => '_blank']) ?>
-        </p>
+
     <?php endif; ?>
 
 
@@ -341,4 +349,21 @@ $dateToday = date('d-m-Y');
             checkbox.checked = isChecked;
         });
     });
+
+    function filterTable() {
+        let input = document.getElementById('search-input');
+        let filter = input.value.toLowerCase();
+        let rows = document.querySelectorAll('.customer-row'); // Gantilah selector untuk target tabel yang sesuai
+
+        rows.forEach(function (row) {
+            let name = row.getAttribute('data-name').toLowerCase();
+            if (name.includes(filter)) {
+                row.style.display = '';  // Tampilkan baris jika nama sesuai pencarian
+            } else {
+                row.style.display = 'none';  // Sembunyikan baris jika nama tidak sesuai pencarian
+            }
+        });
+    }
+
+
 </script>
