@@ -109,6 +109,7 @@ class UndianController extends Controller
                     $query->andWhere(['lomba_id' => $lomba_id]);
                 }
             ]),
+            'pagination' => false,
         ]);
 
         // Render tampilan print dengan data yang disaring berdasarkan 'lomba_id'

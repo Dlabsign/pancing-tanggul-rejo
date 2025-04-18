@@ -47,6 +47,7 @@ class customerSearch extends customer
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => false,
         ]);
 
         $this->load($params, $formName);

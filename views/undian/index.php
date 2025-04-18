@@ -50,10 +50,14 @@ $dateToday = date('d-m-Y');
                 <table class="table table-bordered">
                     <thead style="text-align: center;">
                         <tr>
-                            <th>Pilih</th>
+                            <th style="text-align: center;">
+                                <input type="checkbox" id="check-all" style="transform: scale(1.3);">
+                            </th>
+
                             <th>Nama</th>
                             <th>Lapak</th>
                             <th>NO Lapak</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -73,6 +77,15 @@ $dateToday = date('d-m-Y');
                             $sudahDiundi = $undian !== null;
                             ?>
                             <tr>
+                                <!-- <td style="text-align: center;">
+                                    <?php if (!$sudahDiundi): ?>
+                                        <input type="checkbox" class="customer-checkbox" data-lapak="<?= $customer->lapak ?>"
+                                            value="<?= $customer->id ?>" style="transform: scale(1.5); background-color: blue;">
+                                    <?php else: ?>
+                                        <span style="color: gray;">Sudah</span>
+                                    <?php endif; ?>
+                                </td> -->
+
                                 <td style="text-align: center;">
                                     <?php if (!$sudahDiundi): ?>
                                         <input type="checkbox" class="customer-checkbox" data-lapak="<?= $customer->lapak ?>"
@@ -81,7 +94,8 @@ $dateToday = date('d-m-Y');
                                         <span style="color: gray;">Sudah</span>
                                     <?php endif; ?>
                                 </td>
-                                <td><?= Html::encode($customer->nama) ?></td>
+
+                                <!-- <td><?= Html::encode($customer->nama) ?></td> -->
                                 <td><?= Html::encode($customer->lapak) ?></td>
                                 <td class="lapak-number" style="font-weight: bold; text-align: center;"
                                     id="lapak-<?= $customer->id ?>">
@@ -320,6 +334,12 @@ $dateToday = date('d-m-Y');
             }
 
             localStorage.setItem('selectedCustomers', JSON.stringify(selectedCustomers));
+        });
+    });
+    document.getElementById('check-all').addEventListener('change', function () {
+        let isChecked = this.checked;
+        document.querySelectorAll('.customer-checkbox').forEach(function (checkbox) {
+            checkbox.checked = isChecked;
         });
     });
 </script>
