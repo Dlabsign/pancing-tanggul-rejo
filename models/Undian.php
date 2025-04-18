@@ -2,19 +2,21 @@
 
 namespace app\models;
 use Yii;
+use app\models\Customer; // Ensure the correct namespace for the Customer class
 
 class Undian extends \yii\db\ActiveRecord
 {
 
     public static function tableName()
     {
-        return 'undian';
+        return 'undian'; // Ensure this matches your database table name
     }
+
     public function rules()
     {
         return [
-            [['customer_id', 'merah_id', 'hitam_id'], 'required'],
-            [['customer_id', 'merah_id', 'hitam_id'], 'integer'],
+            [['customer_id', 'lomba_id'], 'required'],
+            [['customer_id', 'lomba_id'], 'integer'],
         ];
     }
 
@@ -23,9 +25,19 @@ class Undian extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'customer_id' => 'Customer ID',
-            'merah_id' => 'Merah ID',
-            'hitam_id' => 'Hitam ID',
+            'lapak' => 'Lapak',
+            'lomba_id' => 'Lomba Id',
         ];
     }
+
+    public function getCustomer()
+    {
+        return $this->hasOne(Customer::class, ['id' => 'customer_id']);
+    }
+    public function getLomba()
+    {
+        return $this->hasOne(Customer::class, ['lomba_id' => 'id']);
+    }
+
 
 }

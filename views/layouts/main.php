@@ -47,17 +47,19 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             'options' => ['class' => 'navbar-nav ms-auto'],
             'items' => [
                 ['label' => 'Customer', 'url' => ['/customer/index']],
+                ['label' => 'Lomba', 'url' => ['/lomba/index']],
                 ['label' => 'Undian', 'url' => ['/undian/index']],
-                Yii::$app->user->isGuest
-                ? ['label' => 'Login', 'url' => ['/site/login']]
-                : '<li class="nav-item">'
-                . Html::beginForm(['/site/logout'])
-                . Html::submitButton(
-                    'Logout (' . Yii::$app->user->identity->username . ')',
-                    ['class' => 'nav-link btn btn-link logout']
-                )
-                . Html::endForm()
-                . '</li>',
+                // Yii::$app->user->isGuest
+                // ? ['label' => 'Login', 'url' => ['/site/login']]
+                // : '<li class="nav-item">'
+                // . Html::beginForm(['/site/logout'])
+                // . Html::submitButton(
+                //     'Logout (' . Yii::$app->user->identity->username . ')',
+                //     ['class' => 'nav-link btn btn-link logout']
+                // )
+                // . Html::endForm()
+                // . 
+                '</li>',
             ],
         ]);
 

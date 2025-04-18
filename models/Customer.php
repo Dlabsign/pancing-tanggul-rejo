@@ -38,6 +38,7 @@ class Customer extends \yii\db\ActiveRecord
     public $c4_merah;
     public $c4_hitam;
     public $ikan_id_hitam;
+    public $customer_id;
 
 
     /**
@@ -78,4 +79,9 @@ class Customer extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Hitam::class, ['customer_id' => 'id']);
     }
+    public function getUndians()
+    {
+        return $this->hasMany(Undian::class, ['customer_id' => 'id']);
+    }
+
 }

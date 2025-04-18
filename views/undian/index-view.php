@@ -7,7 +7,6 @@ use app\models\Lomba;
 
 // $customers = Customer::find()->all();
 $customers = $dataProvider->getModels();
-$dateToday = date('d-m-Y');
 
 ?>
 
@@ -16,8 +15,13 @@ $dateToday = date('d-m-Y');
         'method' => 'get',
         'action' => ['index'], // pastikan diarahkan ke action yang sesuai
     ]); ?>
+    <h1>Undian (No. Lapak)</h1>
+    <hr>
+    <?php
 
-    <div class="lomba-form" style="margin-bottom: 30px;">
+    $lombaDates = Lomba::find()->select('tanggal')->all();
+    ?>
+    <div class="lomba-form col-lg-3" style="margin-bottom: 30px;">
         <?php $form = ActiveForm::begin([
             'action' => ['index'],
             'method' => 'post',
@@ -28,41 +32,36 @@ $dateToday = date('d-m-Y');
         ?>
 
         <?php if (empty($id) && empty($tanggalInput)): ?>
-            <h1>Undian (No. Lapak)</h1>
-            <div class="col-lg-3">
-                <?= $form->field($tanggal, 'tanggal')->textInput([
-                    'type' => 'date',
-                    'value' => $tanggal->tanggal ?? ''
-                ]) ?>
-            </div>
+            <?= $form->field($tanggal, 'tanggal')->textInput([
+                'type' => 'date',
+                'value' => $tanggal->tanggal ?? ''
+            ]) ?>
             <div class="form-group">
                 <?= Html::submitButton('Simpan', ['class' => 'btn btn-success']) ?>
             </div>
         <?php elseif (!empty($id) && !empty($tanggalInput)): ?>
-            <h1><?= Html::encode($tanggalInput) ?></h1>
+            <h3><?= Html::encode($tanggalInput) ?></h3>
         <?php endif; ?>
 
     </div>
-    <?php if ($lomba_id !== null): ?>
 
-        <div style="display: flex;">
-            <div style="flex: 1; padding-right: 20px;">
-                <table class="table table-bordered">
-                    <thead style="text-align: center;">
-                        <tr>
-                            <th>Pilih</th>
-                            <th>Nama</th>
-                            <th>Lapak</th>
-                            <th>NO Lapak</th>
-                        </tr>
-                    </thead>
+
+    <!-- Form Pencarian -->
+    <div style="display: flex;">
+        <!-- Tabel di sisi kiri -->
+        <div style="flex: 1; padding-right: 20px;">
+            <hr>
+            <table class="table table-bordered">
+                <thead style="text-align: center;">
+                    <tr>
+                        <th>Pilih</th>
+                        <th>Nama</th>
+                        <th>Lapak</th>
+                        <th>NO Lapak</th>
+                    </tr>
+                </thead>
+                <?php if ($lomba_id !== null): ?>
                     <tbody>
-                        <?php
-                        usort($customers, function ($a, $b) {
-                            return $b->lapak - $a->lapak;
-                        });
-                        ?>
-
                         <?php foreach ($customers as $customer): ?>
                             <?php
                             // Cek apakah customer sudah diundi berdasarkan lomba_id
@@ -87,6 +86,7 @@ $dateToday = date('d-m-Y');
                                     id="lapak-<?= $customer->id ?>">
                                     <?php if ($sudahDiundi): ?>
                                         <?php
+                                        // Tampilkan lapak yang diundi jika customer sudah diundi
                                         echo Html::encode($undian->lapak);
                                         ?>
                                     <?php else: ?>
@@ -97,25 +97,42 @@ $dateToday = date('d-m-Y');
                         <?php endforeach; ?>
                     </tbody>
 
-                </table>
+                <?php endif; ?>
+            </table>
 
+        </div>
+        <!-- Area animasi undian -->
+        <div style="text-align: center; padding-left: 20px;">
+            <h3>Undian Nomor Lapak</h3>
+            <div id="lottery-animation"
+                style="font-size: 5rem; font-weight: bold; margin: 20px 0; background-color: red;">
+                <span id="lottery-number" style="color: white;">-</span>
             </div>
-            <!-- Area animasi undian -->
-            <div style="text-align: center; padding-left: 20px;">
-                <h3>Undian Nomor Lapak</h3>
-                <div id="lottery-animation"
-                    style="font-size: 5rem; font-weight: bold; margin: 20px 0; background-color: red;">
-                    <span id="lottery-number" style="color: white;">-</span>
-                </div>
-                <button type="button" id="spin-lottery" class="btn btn-success">Mulai Putaran</button>
+            <button type="button" id="spin-lottery" class="btn btn-success">Mulai Putaran</button>
+        </div>
+    </div>
+
+    <div id="lottery-modal" style="display: none;">
+        <div
+            style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 999;">
+            <div
+                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 5px;">
+                <h3>
+                    Nama:
+                    <b id="modal-customer"></b>
+                </h3>
+                <h3>
+                    No. Lapak:
+                    <b id="modal-lapak"></b>
+                </h3>
+                <button type="button" onclick="closeModal()" class="btn btn-danger">Tutup</button>
             </div>
         </div>
+    </div>
+    <p>
+        <?= Html::a('Cetak Daftar Undian', ['undian/print'], ['class' => 'btn btn-primary', 'target' => '_blank']) ?>
 
-        <p>
-            <?= Html::a('Cetak Daftar Undian', ['undian/print', 'id' => Yii::$app->request->get('id'), 'tanggal' => Yii::$app->request->get('tanggal')], ['class' => 'btn btn-primary', 'target' => '_blank']) ?>
-        </p>
-    <?php endif; ?>
-
+    </p>
 
 
     <?php ActiveForm::end(); ?>
@@ -205,32 +222,14 @@ $dateToday = date('d-m-Y');
         animateLotteryNumber(lapakList[0], () => {
             document.getElementById('lapak-' + customerId).textContent = lapakList.join(' - ');
             customersDone.push(customerId);
-            if (cb) cb.parentElement.innerHTML = '';
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const lombaId = urlParams.get('id');
-
-            $.post(`http://localhost/pancing/web/undian/index?id=${lombaId}`, {
-                undian_data: JSON.stringify({
-                    customer_id: customerId,
-                    customer_name: customerName,
-                    lapak: lapakList.join(' - ')
-                }),
-                _csrf: '<?= Yii::$app->request->csrfToken ?>'
-            }).done(function (response) {
-                console.log('Data berhasil disimpan:', response);
-            }).fail(function (xhr, status, error) {
-                console.error('Gagal simpan:', error);
-            });
-
-            i++;
-            setTimeout(undiBerikutnya, 1100);
+            if (cb) cb.parentElement.innerHTML = ''; // hapus checkbox
+            showModal(lapakList.join(' - '), customerName);
         });
     }
 
     function animateLotteryNumber(finalNumber, callback) {
         let numberElement = document.getElementById('lottery-number');
-        let duration = 1000;
+        let duration = 3600;
         let startTime = null;
 
         function animate(time) {

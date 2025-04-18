@@ -99,7 +99,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             : '<div style="text-align: center;"><i class="fas fa-ban" style="color:#f31212;"></i></div>';
                     },
             ],
-            
+
             [
                 'header' => 'HITAM',
                 'value' => function ($model) {
@@ -190,9 +190,9 @@ $this->params['breadcrumbs'][] = $this->title;
             //         },
             // ],
             [
-                'class' => \yii\grid\ActionColumn::className(),
+                'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, $model, $key, $index, $column) {
-                        return \yii\helpers\Url::toRoute([$action, 'id' => $model->id]);
+                        return Url::toRoute([$action, 'id' => $model->id]);
                     },
                 'buttons' => [
                     'view' => function ($url, $model) {
