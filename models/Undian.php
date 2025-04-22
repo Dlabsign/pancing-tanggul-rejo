@@ -16,7 +16,7 @@ class Undian extends \yii\db\ActiveRecord
     {
         return [
             [['customer_id', 'lomba_id'], 'required'],
-            [['customer_id', 'lomba_id'], 'integer'],
+            [['customer_id', 'lomba_id', 'lapak1', 'lapak2'], 'integer'],
         ];
     }
 
@@ -25,7 +25,8 @@ class Undian extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'customer_id' => 'Customer ID',
-            'lapak' => 'Lapak',
+            'lapak1' => 'Lapak 1',
+            'lapak2' => 'Lapak 2',
             'lomba_id' => 'Lomba Id',
         ];
     }

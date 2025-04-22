@@ -5,7 +5,6 @@ use yii\widgets\ActiveForm;
 use app\models\Customer;
 use app\models\Lomba;
 
-// $customers = Customer::find()->all();
 $customers = $dataProvider->getModels();
 $dateToday = date('d-m-Y');
 
@@ -14,7 +13,7 @@ $dateToday = date('d-m-Y');
 <div class="undian-index">
     <?php $form = ActiveForm::begin([
         'method' => 'get',
-        'action' => ['index'], // pastikan diarahkan ke action yang sesuai
+        'action' => ['index'], // Pastikan diarahkan ke action yang sesuai
     ]); ?>
 
     <div class="lomba-form" style="margin-bottom: 30px;">
@@ -45,15 +44,11 @@ $dateToday = date('d-m-Y');
     </div>
 
     <?php if ($lomba_id !== null): ?>
-
         <div style="display: flex;">
             <div style="flex: 1; padding-right: 20px;">
-                <div style="margin-bottom: 10px;">
-                    <!-- Tambahkan input pencarian -->
-                    <input style="font-size:2rem; font-weight:bold;" type="text" id="search-input" class="form-control"
-                        placeholder="Cari Nama Customer..." oninput="filterTable()"
-                        onkeydown="if(event.key === 'Enter'){ event.preventDefault(); return false; }">
-                </div>
+                <input style="font-size:2rem; font-weight:bold;" type="text" id="search-input" class="form-control"
+                    placeholder="Cari Nama Customer..." oninput="filterTable()"
+                    onkeydown="if(event.key === 'Enter'){ event.preventDefault(); return false; }">
                 <p>
                     <?= Html::a('Cetak Daftar Undian', ['undian/print', 'id' => Yii::$app->request->get('id'), 'tanggal' => Yii::$app->request->get('tanggal')], ['class' => 'btn btn-primary', 'target' => '_blank']) ?>
                 </p>
@@ -66,7 +61,6 @@ $dateToday = date('d-m-Y');
                             <th>Nama</th>
                             <th>Lapak</th>
                             <th>NO Lapak</th>
-
                         </tr>
                     </thead>
                     <tbody>
@@ -82,19 +76,9 @@ $dateToday = date('d-m-Y');
                             $undian = Undian::find()
                                 ->where(['customer_id' => $customer->id, 'lomba_id' => $lomba_id])
                                 ->one();
-
                             $sudahDiundi = $undian !== null;
                             ?>
                             <tr class="customer-row" data-name="<?= Html::encode($customer->nama) ?>">
-                                <!-- <td style="text-align: center;">
-                                    <?php if (!$sudahDiundi): ?>
-                                        <input type="checkbox" class="customer-checkbox" data-lapak="<?= $customer->lapak ?>"
-                                            value="<?= $customer->id ?>" style="transform: scale(1.5); background-color: blue;">
-                                    <?php else: ?>
-                                        <span style="color: gray;">Sudah</span>
-                                    <?php endif; ?>
-                                </td> -->
-
                                 <td style="text-align: center;">
                                     <?php if (!$sudahDiundi): ?>
                                         <input type="checkbox" class="customer-checkbox" data-lapak="<?= $customer->lapak ?>"
@@ -107,11 +91,14 @@ $dateToday = date('d-m-Y');
                                 <td style="text-align: center;"><?= Html::encode($customer->nama) ?></td>
                                 <td style="text-align: center;"><?= Html::encode($customer->lapak) ?></td>
                                 <td class="lapak-number" style="font-weight: bold; text-align: center;"
-                                    id="lapak-<?= $customer->id ?>">
+                                    id="lapak-<?= Html::encode($customer->id) ?>">
                                     <?php if ($sudahDiundi): ?>
-                                        <?php
-                                        echo Html::encode($undian->lapak);
-                                        ?>
+                                        <?= Html::encode(
+                                            $undian->lapak2 && $undian->lapak1 != $undian->lapak2
+                                            ? "{$undian->lapak1} - {$undian->lapak2}"
+                                            : $undian->lapak1
+                                        ) ?>
+
                                     <?php else: ?>
                                         ---
                                     <?php endif; ?>
@@ -119,11 +106,10 @@ $dateToday = date('d-m-Y');
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
-
                 </table>
 
             </div>
-            <!-- Area animasi undian -->
+
             <div style="text-align: center; padding-left: 20px;">
                 <h3>Undian Nomor Lapak</h3>
                 <div id="lottery-animation"
@@ -133,23 +119,36 @@ $dateToday = date('d-m-Y');
                 <button type="button" id="spin-lottery" class="btn btn-success">Mulai Putaran</button>
             </div>
         </div>
-
-
     <?php endif; ?>
-
-
 
     <?php ActiveForm::end(); ?>
 </div>
 
 <script>
-
     const totalLapak = 152;
-    const lapakUsed = [];
+    let lapakUsed = [];
     const customersDone = [];
     let orderedCustomers = [];
     let i = 0;
 
+    const customerData = <?= json_encode($customers) ?>;
+
+    // Load lapak dari database
+    function loadUsedLapak(callback) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const lombaId = urlParams.get('id');
+
+        $.getJSON(`http://localhost/pancing/web/undian/get-lapak-used?id=${lombaId}`, function (data) {
+            data.forEach(item => {
+                if (!lapakUsed.includes(item.lapak1)) lapakUsed.push(item.lapak1);
+                if (!lapakUsed.includes(item.lapak2)) lapakUsed.push(item.lapak2);
+            });
+            console.log("Lapak yang sudah dipakai:", lapakUsed);
+            if (callback) callback();
+        });
+    }
+
+    // Event tombol spin
     document.getElementById('spin-lottery').addEventListener('click', function () {
         const checkboxes = document.querySelectorAll('.customer-checkbox:checked');
         const groupTwo = [];
@@ -158,12 +157,9 @@ $dateToday = date('d-m-Y');
         checkboxes.forEach(cb => {
             const id = cb.value;
             const jumlahLapak = parseInt(cb.getAttribute('data-lapak'));
-            if (!customersDone.includes(id)) {
-                if (jumlahLapak === 2) {
-                    groupTwo.push(id);
-                } else {
-                    groupOne.push(id);
-                }
+            if (!customersDone.includes(id) && !orderedCustomers.includes(id)) {
+                jumlahLapak === 2 ? groupTwo.push(id) : groupOne.push(id);
+                orderedCustomers.push(id);
             }
         });
 
@@ -178,47 +174,57 @@ $dateToday = date('d-m-Y');
         undiBerikutnya();
     });
 
+    // Proses undian per customer
     function undiBerikutnya() {
         if (i >= orderedCustomers.length || lapakUsed.length >= totalLapak) return;
 
         const customerId = orderedCustomers[i];
         const cb = document.querySelector(`.customer-checkbox[value="${customerId}"]`);
         const jumlahLapak = parseInt(cb.getAttribute('data-lapak'));
-        let customerName = '';
-
-        <?php foreach ($customers as $customer): ?>
-            if (customerId == <?= $customer->id ?>) {
-                customerName = "<?= $customer->nama ?>";
-            }
-        <?php endforeach; ?>
+        const customer = customerData.find(c => c.id == customerId);
+        const customerName = customer ? customer.nama : 'Unknown';
 
         let lapakList = [];
 
-        function generateUniqueLapak() {
-            let rand = Math.floor(Math.random() * totalLapak) + 1;
-            while (lapakUsed.includes(rand)) {
-                rand = Math.floor(Math.random() * totalLapak) + 1;
+        function getRandomOddEvenPair() {
+            const availablePairs = [];
+            for (let n = 1; n < totalLapak; n += 2) {
+                if (!lapakUsed.includes(n) && !lapakUsed.includes(n + 1)) {
+                    availablePairs.push([n, n + 1]);
+                }
             }
-            return rand;
+            if (availablePairs.length === 0) return null;
+            return availablePairs[Math.floor(Math.random() * availablePairs.length)];
         }
 
-        if (jumlahLapak === 2) {
-            let lapak1 = generateUniqueLapak();
-            let lapak2 = lapak1 + 1;
-
-            while (
-                lapakUsed.includes(lapak1) ||
-                lapakUsed.includes(lapak2) ||
-                lapak2 > totalLapak
-            ) {
-                lapak1 = generateUniqueLapak();
-                lapak2 = lapak1 + 1;
+        function getRandomAvailableNumber() {
+            const available = [];
+            for (let n = 1; n <= totalLapak; n++) {
+                if (!lapakUsed.includes(n)) available.push(n);
             }
+            if (available.length === 0) return null;
+            return available[Math.floor(Math.random() * available.length)];
+        }
 
-            lapakUsed.push(lapak1, lapak2);
-            lapakList = [lapak1, lapak2];
+        // Penentuan lapak
+        if (jumlahLapak === 2) {
+            const pair = getRandomOddEvenPair();
+            if (!pair) {
+                alert('Tidak ada pasangan lapak ganjil-genap tersedia.');
+                i++;
+                setTimeout(undiBerikutnya, 100);
+                return;
+            }
+            lapakUsed.push(...pair);
+            lapakList = pair;
         } else {
-            let lapak = generateUniqueLapak();
+            const lapak = getRandomAvailableNumber();
+            if (!lapak) {
+                alert('Lapak tidak tersedia untuk 1 slot.');
+                i++;
+                setTimeout(undiBerikutnya, 100);
+                return;
+            }
             lapakUsed.push(lapak);
             lapakList = [lapak];
         }
@@ -231,40 +237,42 @@ $dateToday = date('d-m-Y');
             const urlParams = new URLSearchParams(window.location.search);
             const lombaId = urlParams.get('id');
 
+            const lapak1 = lapakList.length === 2 ? lapakList[0] : lapakList[0];
+            const lapak2 = lapakList.length === 2 ? lapakList[1] : lapakList[0];
+
             $.post(`http://localhost/pancing/web/undian/index?id=${lombaId}`, {
                 undian_data: JSON.stringify({
-                    customer_id: customerId,
+                    customer_id: parseInt(customerId),
                     customer_name: customerName,
-                    lapak: lapakList.join(' - ')
+                    lapak1: lapak1,
+                    lapak2: lapak2
                 }),
                 _csrf: '<?= Yii::$app->request->csrfToken ?>'
-            }).done(function (response) {
+            }).done(response => {
                 console.log('Data berhasil disimpan:', response);
-            }).fail(function (xhr, status, error) {
+            }).fail((xhr, status, error) => {
                 console.error('Gagal simpan:', error);
             });
 
             i++;
-            setTimeout(undiBerikutnya, 1100);
+            setTimeout(undiBerikutnya, 500);
         });
     }
 
+    // Animasi angka undian
     function animateLotteryNumber(finalNumber, callback) {
-        let numberElement = document.getElementById('lottery-number');
-        let duration = 1000;
+        const numberElement = document.getElementById('lottery-number');
+        const duration = 1000;
         let startTime = null;
 
         function animate(time) {
             if (!startTime) startTime = time;
-            let progress = time - startTime;
-            let speed = Math.max(10, 300 - progress / 5);
-
+            const progress = time - startTime;
+            const speed = Math.max(10, 300 - progress / 5);
             numberElement.textContent = Math.floor(Math.random() * totalLapak) + 1;
 
             if (progress < duration) {
-                setTimeout(() => {
-                    requestAnimationFrame(animate);
-                }, speed);
+                setTimeout(() => requestAnimationFrame(animate), speed);
             } else {
                 numberElement.textContent = finalNumber;
                 callback();
@@ -274,96 +282,17 @@ $dateToday = date('d-m-Y');
         requestAnimationFrame(animate);
     }
 
-    function showModal(lapak, customerName) {
-        document.getElementById('modal-lapak').textContent = lapak;
-        document.getElementById('modal-customer').textContent = customerName;
-        document.getElementById('lottery-modal').style.display = 'block';
-        document.getElementById('lottery-modal').style.zIndex = '1000';
-    }
-
-    function closeModal() {
-        // Menutup modal
-        document.getElementById('lottery-modal').style.display = 'none';
-
-        const customerName = document.getElementById('modal-customer').textContent;
-        const lapak = document.getElementById('modal-lapak').textContent;
-
-        // Mengambil ID customer dari orderedCustomers (asumsi orderedCustomers[i] sudah didefinisikan)
-        const customerId = orderedCustomers[i];
-
-        // Kirim data ke actionIndex controller menggunakan AJAX
-        const urlParams = new URLSearchParams(window.location.search);
-        const lombaId = urlParams.get('id');
-
-        $.post(`http://localhost/pancing/web/undian/index?id=${lombaId}`, {
-            // $.post('http://localhost/pancing/web/undian/index', {
-
-            undian_data: JSON.stringify({
-                customer_id: customerId,
-                customer_name: customerName,
-                lapak: lapak
-            }),
-            _csrf: '<?= Yii::$app->request->csrfToken ?>'
-        }).done(function (response) {
-            console.log('Server Response:', response);
-            if (response.success) {
-                console.log('Data berhasil disimpan ke tabel undian');
-            } else {
-                console.error('Gagal menyimpan data:', response.message);
-            }
-        }).fail(function (xhr, status, error) {
-            console.error('Error:', error);
-        });
-
-        i++;
-        setTimeout(undiBerikutnya, 500);
-    }
-
-
-
-    let selectedCustomers = JSON.parse(localStorage.getItem('selectedCustomers')) || [];
-
-    selectedCustomers.forEach(id => {
-        const checkbox = document.getElementById('checkbox-' + id);
-        if (checkbox) checkbox.checked = true;
-    });
-
-    document.querySelectorAll('.customer-checkbox').forEach(function (checkbox) {
-        checkbox.addEventListener('change', function () {
-            const customerId = this.value;
-
-            if (this.checked) {
-                if (!selectedCustomers.includes(customerId)) {
-                    selectedCustomers.push(customerId);
-                }
-            } else {
-                selectedCustomers = selectedCustomers.filter(id => id !== customerId);
-            }
-
-            localStorage.setItem('selectedCustomers', JSON.stringify(selectedCustomers));
-        });
-    });
-    document.getElementById('check-all').addEventListener('change', function () {
-        let isChecked = this.checked;
-        document.querySelectorAll('.customer-checkbox').forEach(function (checkbox) {
-            checkbox.checked = isChecked;
-        });
-    });
-
+    // Filter customer di tabel
     function filterTable() {
-        let input = document.getElementById('search-input');
-        let filter = input.value.toLowerCase();
-        let rows = document.querySelectorAll('.customer-row'); // Gantilah selector untuk target tabel yang sesuai
-
-        rows.forEach(function (row) {
-            let name = row.getAttribute('data-name').toLowerCase();
-            if (name.includes(filter)) {
-                row.style.display = '';  // Tampilkan baris jika nama sesuai pencarian
-            } else {
-                row.style.display = 'none';  // Sembunyikan baris jika nama tidak sesuai pencarian
-            }
+        const filter = document.getElementById('search-input').value.toLowerCase();
+        document.querySelectorAll('.customer-row').forEach(row => {
+            const name = row.getAttribute('data-name').toLowerCase();
+            row.style.display = name.includes(filter) ? '' : 'none';
         });
     }
 
-
+    // Saat halaman siap, load data dari DB
+    document.addEventListener('DOMContentLoaded', function () {
+        loadUsedLapak();
+    });
 </script>

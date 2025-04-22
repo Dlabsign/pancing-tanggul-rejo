@@ -37,7 +37,7 @@ class UndianController extends Controller
                 $data = json_decode($undianData, true);
 
                 // Pastikan customer_id dan lapak tersedia (lomba_id pakai dari URL $id)
-                if (!isset($data['customer_id'], $data['lapak'])) {
+                if (!isset($data['customer_id'], $data['lapak1'], $data['lapak2'])) {
                     return $this->asJson([
                         'success' => false,
                         'message' => 'Data tidak lengkap. Pastikan customer_id dan lapak tersedia.'
@@ -53,7 +53,8 @@ class UndianController extends Controller
                 $model = new Undian();
                 $model->customer_id = $data['customer_id'];
                 $model->tanggal = $lomba->tanggal;
-                $model->lapak = $data['lapak'];
+                $model->lapak1 = $data['lapak1'];
+                $model->lapak2 = $data['lapak2'];
                 $model->lomba_id = $id; // gunakan id dari URL, bukan dari POST
 
                 if ($model->save()) {
@@ -62,7 +63,8 @@ class UndianController extends Controller
                         'data' => [
                             'customer_id' => $model->customer_id,
                             'tanggal' => $model->tanggal,
-                            'lapak' => $model->lapak,
+                            'lapak1' => $model->lapak1,
+                            'lapak2' => $model->lapak2,
                             'lomba_id' => $model->lomba_id,
                         ]
                     ]);
@@ -118,6 +120,20 @@ class UndianController extends Controller
             'lomba_id' => $lomba_id,
         ]);
     }
+
+    public function actionGetLapakUsed($id)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $data = Undian::find()
+            ->select(['lapak1', 'lapak2'])
+            ->where(['lomba_id' => $id])
+            ->asArray()
+            ->all();
+
+        return $data;
+    }
+
 
 
 }
