@@ -103,6 +103,11 @@ $dateToday = date('d-m-Y');
                                         ---
                                     <?php endif; ?>
                                 </td>
+                                <td>
+                                    <p>
+                                        <?= Html::a('Cetak Nota ', ['undian/print', 'id' => Yii::$app->request->get('id'), 'tanggal' => Yii::$app->request->get('tanggal')], ['class' => 'btn btn-primary', 'target' => '_blank']) ?>
+                                    </p>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
