@@ -51,7 +51,9 @@ $dateToday = date('d-m-Y');
         @media print {
             @page {
                 size: 210mm 670mm;
+                /* A4 width, 75cm height */
                 margin: 10mm;
+                /* Opsional: atur margin cetak */
             }
 
             body * {
@@ -151,78 +153,81 @@ $dateToday = date('d-m-Y');
                         // Urutkan berdasarkan nomor lapak pertama
                         usort($groupedEntries, fn($a, $b) => ($a['lapaks'][0] ?? 0) <=> ($b['lapaks'][0] ?? 0));
                         ?>
+                        <div class="print-area">
 
-                        <?php foreach ($groupedEntries as $entry): ?>
-                            <?php
-                            $lapakCount = count($entry['lapaks']);
-                            $isSameLapak = ($lapakCount === 2) && ($entry['lapaks'][0] === $entry['lapaks'][1]);
-                            ?>
+                            <?php foreach ($groupedEntries as $entry): ?>
+                                <?php
+                                $lapakCount = count($entry['lapaks']);
+                                $isSameLapak = ($lapakCount === 2) && ($entry['lapaks'][0] === $entry['lapaks'][1]);
+                                ?>
 
-                            <?php for ($i = 0; $i < $lapakCount; $i++): ?>
-                                <tr>
-                                    <?php if ($isSameLapak && $i === 0): ?>
-                                        <td style="text-align:center; font-weight: bold;" rowspan="2">
-                                            <?= str_pad($entry['lapaks'][0], 2, '0', STR_PAD_LEFT) ?>
-                                        </td>
-                                    <?php elseif (!$isSameLapak): ?>
-                                        <td style="text-align:center; font-weight: bold;">
-                                            <?= str_pad($entry['lapaks'][$i], 2, '0', STR_PAD_LEFT) ?>
-                                        </td>
-                                    <?php endif; ?>
+                                <?php for ($i = 0; $i < $lapakCount; $i++): ?>
+                                    <tr>
+                                        <?php if ($isSameLapak && $i === 0): ?>
+                                            <td style="text-align:center; font-weight: bold;" rowspan="2">
+                                                <?= str_pad($entry['lapaks'][0], 2, '0', STR_PAD_LEFT) ?>
+                                            </td>
+                                        <?php elseif (!$isSameLapak): ?>
+                                            <td style="text-align:center; font-weight: bold;">
+                                                <?= str_pad($entry['lapaks'][$i], 2, '0', STR_PAD_LEFT) ?>
+                                            </td>
+                                        <?php endif; ?>
 
 
-                                    <?php if ($isSameLapak && $i === 0): ?>
-                                        <td style="text-align:center; font-weight: bold;" rowspan="2">
-                                            <?= str_pad($entry['nama'], 2, '0', STR_PAD_LEFT) ?>
-                                        </td>
-                                    <?php elseif (!$isSameLapak): ?>
-                                        <td style="text-align:center; font-weight: bold;">
-                                            <?= str_pad($entry['nama'], 2, '0', STR_PAD_LEFT) ?>
-                                        </td>
-                                    <?php endif; ?>
+                                        <?php if ($isSameLapak && $i === 0): ?>
+                                            <td style="text-align:center; font-weight: bold;" rowspan="2">
+                                                <?= str_pad($entry['nama'], 2, '0', STR_PAD_LEFT) ?>
+                                            </td>
+                                        <?php elseif (!$isSameLapak): ?>
+                                            <td style="text-align:center; font-weight: bold;">
+                                                <?= str_pad($entry['nama'], 2, '0', STR_PAD_LEFT) ?>
+                                            </td>
+                                        <?php endif; ?>
 
-                                    <?php if ($i === 0): ?>
-                                       
-                                        <td rowspan="<?= $lapakCount ?>">
-                                            <?= $entry['ss1'] == 1 ? '<div style="text-align: center; color:blue;"><i class="fas fa-check"></i></div>' : '' ?>
-                                        </td>
-                                        <td rowspan="<?= $lapakCount ?>">
-                                            <?= $entry['ss2'] == 1 ? '<div style="text-align: center; color:blue;"><i class="fas fa-check"></i></div>' : '' ?>
-                                        </td>
-                                        <td rowspan="<?= $lapakCount ?>">
-                                            <?= $entry['ss3'] == 1 ? '<div style="text-align: center; color:blue;"><i class="fas fa-check"></i></div>' : '' ?>
-                                        </td>
-                                    <?php endif; ?>
+                                        <?php if ($i === 0): ?>
 
-                                    <?php
-                                    $warna = $i == 0 ? 'merah' : 'hitam';
-                                    $color = $i == 0 ? 'red' : 'black';
-                                    ?>
+                                            <td rowspan="<?= $lapakCount ?>">
+                                                <?= $entry['ss1'] == 1 ? '<div style="text-align: center; color:blue;"><i class="fas fa-check"></i></div>' : '' ?>
+                                            </td>
+                                            <td rowspan="<?= $lapakCount ?>">
+                                                <?= $entry['ss2'] == 1 ? '<div style="text-align: center; color:blue;"><i class="fas fa-check"></i></div>' : '' ?>
+                                            </td>
+                                            <td rowspan="<?= $lapakCount ?>">
+                                                <?= $entry['ss3'] == 1 ? '<div style="text-align: center; color:blue;"><i class="fas fa-check"></i></div>' : '' ?>
+                                            </td>
+                                        <?php endif; ?>
 
-                                    <td>
-                                        <?= isset($entry[$warna]) && is_object($entry[$warna]) && $entry[$warna]->c1 == 1
-                                            ? '<div style="text-align: center; color:' . $color . ';"><i class="fas fa-check"></i></div>'
-                                            : '' ?>
-                                    </td>
-                                    <td>
-                                        <?= isset($entry[$warna]) && is_object($entry[$warna]) && $entry[$warna]->c2 == 1
-                                            ? '<div style="text-align: center; color:' . $color . ';"><i class="fas fa-check"></i></div>'
-                                            : '' ?>
-                                    </td>
-                                    <td>
-                                        <?= isset($entry[$warna]) && is_object($entry[$warna]) && $entry[$warna]->c3 == 1
-                                            ? '<div style="text-align: center; color:' . $color . ';"><i class="fas fa-check"></i></div>'
-                                            : '' ?>
-                                    </td>
-                                    <td>
-                                        <?= isset($entry[$warna]) && is_object($entry[$warna]) && $entry[$warna]->c4 == 1
-                                            ? '<div style="text-align: center; color:' . $color . ';"><i class="fas fa-check"></i></div>'
-                                            : '' ?>
-                                    </td>
-                                </tr>
-                            <?php endfor; ?>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+                                        <?php
+                                        $warna = $i == 0 ? 'merah' : 'hitam';
+                                        $color = $i == 0 ? 'red' : 'black';
+                                        ?>
+
+                                        <td>
+                                            <?= isset($entry[$warna]) && is_object($entry[$warna]) && $entry[$warna]->c1 == 1
+                                                ? '<div style="text-align: center; color:' . $color . ';"><i class="fas fa-check"></i></div>'
+                                                : '' ?>
+                                        </td>
+                                        <td>
+                                            <?= isset($entry[$warna]) && is_object($entry[$warna]) && $entry[$warna]->c2 == 1
+                                                ? '<div style="text-align: center; color:' . $color . ';"><i class="fas fa-check"></i></div>'
+                                                : '' ?>
+                                        </td>
+                                        <td>
+                                            <?= isset($entry[$warna]) && is_object($entry[$warna]) && $entry[$warna]->c3 == 1
+                                                ? '<div style="text-align: center; color:' . $color . ';"><i class="fas fa-check"></i></div>'
+                                                : '' ?>
+                                        </td>
+                                        <td>
+                                            <?= isset($entry[$warna]) && is_object($entry[$warna]) && $entry[$warna]->c4 == 1
+                                                ? '<div style="text-align: center; color:' . $color . ';"><i class="fas fa-check"></i></div>'
+                                                : '' ?>
+                                        </td>
+                                    </tr>
+                                <?php endfor; ?>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+
                 </tbody>
 
             </table>

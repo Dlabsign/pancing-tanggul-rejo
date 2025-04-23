@@ -72,7 +72,6 @@ $dateToday = date('d-m-Y');
 
                         <?php foreach ($customers as $customer): ?>
                             <?php
-                            // Cek apakah customer sudah diundi berdasarkan lomba_id
                             $undian = Undian::find()
                                 ->where(['customer_id' => $customer->id, 'lomba_id' => $lomba_id])
                                 ->one();
@@ -104,9 +103,15 @@ $dateToday = date('d-m-Y');
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <p>
+                                    <?php if (!$sudahDiundi): ?>
+                                        <p>
+                                            <span style="color: gray;">--</span>
+                                        </p>
+                                    <?php else: ?>
                                         <?= Html::a('Cetak Nota ', ['undian/print', 'id' => Yii::$app->request->get('id'), 'tanggal' => Yii::$app->request->get('tanggal')], ['class' => 'btn btn-primary', 'target' => '_blank']) ?>
-                                    </p>
+
+                                    <?php endif; ?>
+
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -138,7 +143,6 @@ $dateToday = date('d-m-Y');
 
     const customerData = <?= json_encode($customers) ?>;
 
-    // Load lapak dari database
     function loadUsedLapak(callback) {
         const urlParams = new URLSearchParams(window.location.search);
         const lombaId = urlParams.get('id');
@@ -153,7 +157,6 @@ $dateToday = date('d-m-Y');
         });
     }
 
-    // Event tombol spin
     document.getElementById('spin-lottery').addEventListener('click', function () {
         const checkboxes = document.querySelectorAll('.customer-checkbox:checked');
         const groupTwo = [];
@@ -176,12 +179,21 @@ $dateToday = date('d-m-Y');
             return;
         }
 
+        if (lapakUsed.length >= totalLapak) {
+            alert('Semua lapak telah terisi!');
+            return;
+        }
+
         undiBerikutnya();
     });
 
-    // Proses undian per customer
     function undiBerikutnya() {
-        if (i >= orderedCustomers.length || lapakUsed.length >= totalLapak) return;
+        if (i >= orderedCustomers.length || lapakUsed.length >= totalLapak) {
+            if (lapakUsed.length >= totalLapak) {
+                alert('Semua lapak telah terisi!');
+            }
+            return;
+        }
 
         const customerId = orderedCustomers[i];
         const cb = document.querySelector(`.customer-checkbox[value="${customerId}"]`);
@@ -211,14 +223,30 @@ $dateToday = date('d-m-Y');
             return available[Math.floor(Math.random() * available.length)];
         }
 
-        // Penentuan lapak
+        function getAvailableNumbers() {
+            const available = [];
+            for (let n = 1; n <= totalLapak; n++) {
+                if (!lapakUsed.includes(n)) available.push(n);
+            }
+            return available;
+        }
+
+        function getRandomTwoFromArray(array) {
+            const shuffled = array.sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, 2);
+        }
+
         if (jumlahLapak === 2) {
-            const pair = getRandomOddEvenPair();
+            let pair = getRandomOddEvenPair();
             if (!pair) {
-                alert('Tidak ada pasangan lapak ganjil-genap tersedia.');
-                i++;
-                setTimeout(undiBerikutnya, 100);
-                return;
+                const available = getAvailableNumbers();
+                if (available.length < 2) {
+                    alert('Lapak tidak tersedia untuk 2 slot.');
+                    i++;
+                    setTimeout(undiBerikutnya, 100);
+                    return;
+                }
+                pair = getRandomTwoFromArray(available);
             }
             lapakUsed.push(...pair);
             lapakList = pair;
@@ -260,11 +288,16 @@ $dateToday = date('d-m-Y');
             });
 
             i++;
+
+            if (lapakUsed.length >= totalLapak) {
+                alert('Semua lapak telah terisi!');
+                return;
+            }
+
             setTimeout(undiBerikutnya, 500);
         });
     }
 
-    // Animasi angka undian
     function animateLotteryNumber(finalNumber, callback) {
         const numberElement = document.getElementById('lottery-number');
         const duration = 1000;
@@ -287,7 +320,6 @@ $dateToday = date('d-m-Y');
         requestAnimationFrame(animate);
     }
 
-    // Filter customer di tabel
     function filterTable() {
         const filter = document.getElementById('search-input').value.toLowerCase();
         document.querySelectorAll('.customer-row').forEach(row => {
@@ -296,7 +328,6 @@ $dateToday = date('d-m-Y');
         });
     }
 
-    // Saat halaman siap, load data dari DB
     document.addEventListener('DOMContentLoaded', function () {
         loadUsedLapak();
     });
